@@ -1,5 +1,5 @@
 from datetime import timezone
-
+import datetime
 from django.db import models
 
 
@@ -35,7 +35,25 @@ class Website(models.Model):
     status = models.CharField(choices=STATUS_CHOICES, max_length=1)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ['rating']
+
+    def was_released_last_week(self):
+        if self.release_date < datetime.date.today():
+            return "Released before last week"
+        else:
+            return "Released this week"
+
+    @property
+    def get_full_name(self):
+        return f"Este es el nombre completo del sitio web: {self.name}"
+
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return f"/websites/{self.id}"
 
+    def save(self, *args, **kwargs):
+        print("Estamos guardando")
+        super().save(*args, **kwargs)
